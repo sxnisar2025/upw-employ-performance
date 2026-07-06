@@ -1,0 +1,199 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { Pencil, Trash2, Eye } from "lucide-react";
+
+import { useApp } from "@/context/AppContext";
+import { calculateEmployeeSummary } from "@/utils/calculations";
+import SearchInput from "@/components/ui/SearchInput";
+
+export default function EmployeeTable({ onEdit }) {
+  const { employees, deleteEmployee } = useApp();
+
+  const [search, setSearch] = useState("");
+
+  const filteredEmployees = employees.filter((employee) =>
+    employee.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleDelete = (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this employee?"
+    );
+
+    if (confirmDelete) {
+      deleteEmployee(id);
+    }
+  };
+
+  return (
+    <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
+      {/* Header */}
+      <div className="border-b px-6 py-4">
+        <h2 className="text-xl font-semibold">Employees</h2>
+
+        <p className="mt-1 text-sm text-gray-500">
+          Manage all employees and their performance.
+        </p>
+      </div>
+
+      {/* Search */}
+      <div className="border-b p-4">
+        <SearchInput
+          placeholder="Search employee..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-6 py-3 text-left">Employee</th>
+
+              <th className="px-6 py-3 text-left">Email</th>
+
+              <th className="px-6 py-3 text-left">Phone</th>
+
+              <th className="px-6 py-3 text-center">Status</th>
+
+              <th className="px-6 py-3 text-center">Accounts</th>
+
+              <th className="px-6 py-3 text-right">
+                Connect Cost
+              </th>
+
+              <th className="px-6 py-3 text-right">
+                Gross Earn
+              </th>
+
+              <th className="px-6 py-3 text-right">
+                Received
+              </th>
+
+              <th className="px-6 py-3 text-right">
+                Pending
+              </th>
+
+              <th className="px-6 py-3 text-right">
+                Gross Profit
+              </th>
+
+              <th className="px-6 py-3 text-right">
+                Net Profit
+              </th>
+
+              <th className="px-6 py-3 text-center">
+                Action
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filteredEmployees.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={12}
+                  className="py-8 text-center text-gray-500"
+                >
+                  No employee found.
+                </td>
+              </tr>
+            ) : (
+              filteredEmployees.map((employee) => {
+                const summary = calculateEmployeeSummary(employee.id);
+
+                return (
+                  <tr
+                    key={employee.id}
+                    className="border-t hover:bg-gray-50"
+                  >
+                    <td className="px-6 py-4 font-medium">
+                      {employee.name}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      {employee.email}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      {employee.phone}
+                    </td>
+
+                    <td className="px-6 py-4 text-center">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                          employee.status === "Active"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {employee.status}
+                      </span>
+                    </td>
+
+                    <td className="px-6 py-4 text-center">
+                      {summary.accounts}
+                    </td>
+
+                    <td className="px-6 py-4 text-right">
+                      ${summary.connectCost}
+                    </td>
+
+                    <td className="px-6 py-4 text-right">
+                      ${summary.grossEarn}
+                    </td>
+
+                    <td className="px-6 py-4 text-right">
+                      ${summary.received}
+                    </td>
+
+                    <td className="px-6 py-4 text-right">
+                      ${summary.pending}
+                    </td>
+
+                    <td className="px-6 py-4 text-right font-semibold text-green-600">
+                      ${summary.grossProfit}
+                    </td>
+
+                    <td className="px-6 py-4 text-right font-semibold text-blue-600">
+                      ${summary.netProfit}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center gap-4">
+                        <Link
+                          href={`/dashboard/employees/${employee.id}`}
+                        >
+                          <Eye
+                            size={18}
+                            className="cursor-pointer text-blue-600 hover:text-blue-800"
+                          />
+                        </Link>
+
+                        <Pencil
+                          size={18}
+                          onClick={() => onEdit(employee)}
+                          className="cursor-pointer text-green-600 hover:text-green-800"
+                        />
+
+                        <Trash2
+                          size={18}
+                          onClick={() => handleDelete(employee.id)}
+                          className="cursor-pointer text-red-600 hover:text-red-800"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
