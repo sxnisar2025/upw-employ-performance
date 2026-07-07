@@ -8,6 +8,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import Modal from "@/components/ui/Modal";
 import EmployeeTable from "@/components/employee/EmployeeTable";
 import EmployeeForm from "@/components/employee/EmployeeForm";
+import toast from "react-hot-toast";
 
 export default function EmployeesPage() {
   const { addEmployee, updateEmployee } = useApp();
@@ -31,14 +32,21 @@ export default function EmployeesPage() {
   };
 
   const handleSave = (employee) => {
-    if (employee.id) {
-      updateEmployee(employee);
-    } else {
-      addEmployee(employee);
-    }
+  if (employee.id) {
+    updateEmployee(employee);
 
-    closeModal();
-  };
+    toast.success("Employee updated successfully");
+  } else {
+    addEmployee({
+      id: Date.now(),
+      ...employee,
+    });
+
+    toast.success("Employee added successfully");
+  }
+
+  closeModal();
+};
 
   return (
     <div className="space-y-6">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 import { useApp } from "@/context/AppContext";
 
@@ -34,8 +35,15 @@ export default function AccountsPage() {
   const handleSave = (account) => {
     if (account.id) {
       updateAccount(account);
+
+      toast.success("Account updated successfully");
     } else {
-      addAccount(account);
+      addAccount({
+        id: Date.now(),
+        ...account,
+      });
+
+      toast.success("Account added successfully");
     }
 
     closeModal();

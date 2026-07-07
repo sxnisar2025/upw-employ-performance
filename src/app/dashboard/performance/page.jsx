@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 import { useApp } from "@/context/AppContext";
 
@@ -37,11 +38,15 @@ export default function PerformancePage() {
   const handleSave = (record) => {
     if (record.id) {
       updatePerformance(record);
+
+      toast.success("Performance record updated successfully");
     } else {
       addPerformance({
         id: Date.now(),
         ...record,
       });
+
+      toast.success("Performance record added successfully");
     }
 
     closeModal();
