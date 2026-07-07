@@ -77,7 +77,22 @@ return (
       <div className="overflow-x-auto">
         <table className="min-w-full">
 
-          {/* Keep your THEAD exactly the same */}
+         <thead className="bg-gray-100">
+  <tr>
+    <th className="px-6 py-3 text-left">Employee</th>
+    <th className="px-6 py-3 text-left">Email</th>
+    <th className="px-6 py-3 text-left">Phone</th>
+    <th className="px-6 py-3 text-center">Status</th>
+    <th className="px-6 py-3 text-center">Accounts</th>
+    <th className="px-6 py-3 text-right">Connect Cost</th>
+    <th className="px-6 py-3 text-right">Gross Earn</th>
+    <th className="px-6 py-3 text-right">Received</th>
+    <th className="px-6 py-3 text-right">Pending</th>
+    <th className="px-6 py-3 text-right">Gross Profit</th>
+    <th className="px-6 py-3 text-right">Net Profit</th>
+    <th className="px-6 py-3 text-center">Action</th>
+  </tr>
+</thead>
 
           <tbody>
 
@@ -103,7 +118,82 @@ return (
                     key={employee.id}
                     className="border-t hover:bg-gray-50"
                   >
-                    {/* KEEP ALL YOUR EXISTING <td> COLUMNS HERE */}
+                  <>
+  <td className="px-6 py-4 font-medium">
+    {employee.name}
+  </td>
+
+  <td className="px-6 py-4">
+    {employee.email}
+  </td>
+
+  <td className="px-6 py-4">
+    {employee.phone}
+  </td>
+
+  <td className="px-6 py-4 text-center">
+    <span
+      className={`rounded-full px-3 py-1 text-xs font-semibold ${
+        employee.status === "Active"
+          ? "bg-green-100 text-green-700"
+          : "bg-red-100 text-red-700"
+      }`}
+    >
+      {employee.status}
+    </span>
+  </td>
+
+  <td className="px-6 py-4 text-center">
+    {summary.accounts}
+  </td>
+
+  <td className="px-6 py-4 text-right">
+    ${summary.connectCost}
+  </td>
+
+  <td className="px-6 py-4 text-right">
+    ${summary.grossEarn}
+  </td>
+
+  <td className="px-6 py-4 text-right">
+    ${summary.received}
+  </td>
+
+  <td className="px-6 py-4 text-right">
+    ${summary.pending}
+  </td>
+
+  <td className="px-6 py-4 text-right font-semibold text-green-600">
+    ${summary.grossProfit}
+  </td>
+
+  <td className="px-6 py-4 text-right font-semibold text-blue-600">
+    ${summary.netProfit}
+  </td>
+
+  <td className="px-6 py-4">
+    <div className="flex justify-center gap-4">
+      <Link href={`/dashboard/employees/${employee.id}`}>
+        <Eye
+          size={18}
+          className="cursor-pointer text-blue-600 hover:text-blue-800"
+        />
+      </Link>
+
+      <Pencil
+        size={18}
+        onClick={() => onEdit(employee)}
+        className="cursor-pointer text-green-600 hover:text-green-800"
+      />
+
+      <Trash2
+        size={18}
+        onClick={() => handleDelete(employee.id)}
+        className="cursor-pointer text-red-600 hover:text-red-800"
+      />
+    </div>
+  </td>
+</>
                   </tr>
                 );
               })

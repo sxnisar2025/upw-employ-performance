@@ -7,15 +7,35 @@ import { Eye, Pencil, Trash2 } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import SearchInput from "@/components/ui/SearchInput";
 
+import toast from "react-hot-toast";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
+
 export default function AccountTable({ onEdit }) {
-  const {
+   const {
     employees,
     accounts,
     performances,
     deleteAccount,
   } = useApp();
+const [search, setSearch] = useState("");
 
-  const [search, setSearch] = useState("");
+const [openConfirm, setOpenConfirm] = useState(false);
+const [selectedId, setSelectedId] = useState(null);
+
+const handleDelete = (id) => {
+  setSelectedId(id);
+  setOpenConfirm(true);
+};
+
+const confirmDelete = () => {
+  deleteAccount(selectedId);
+
+  toast.success("Account deleted successfully");
+
+  setOpenConfirm(false);
+  setSelectedId(null);
+};
+
 
   const filteredAccounts = accounts.filter((account) => {
     const employee = employees.find(
@@ -35,25 +55,25 @@ export default function AccountTable({ onEdit }) {
       (item) => item.accountId === accountId
     );
 
-    const connectCost = records.reduce(
-      (sum, item) => sum + Number(item.buy || 0),
-      0
-    );
+   const connectCost = records.reduce(
+  (sum, item) => sum + Number(item.connectCost || 0),
+  0
+);
 
-    const grossEarn = records.reduce(
-      (sum, item) => sum + Number(item.earn || 0),
-      0
-    );
+const grossEarn = records.reduce(
+  (sum, item) => sum + Number(item.grossEarn || 0),
+  0
+);
 
-    const received = records.reduce(
-      (sum, item) => sum + Number(item.received || 0),
-      0
-    );
+const received = records.reduce(
+  (sum, item) => sum + Number(item.receivedAmount || 0),
+  0
+);
 
-    const pending = records.reduce(
-      (sum, item) => sum + Number(item.pending || 0),
-      0
-    );
+const pending = records.reduce(
+  (sum, item) => sum + Number(item.pendingAmount || 0),
+  0
+);
 
     return {
       connectCost,
@@ -65,15 +85,6 @@ export default function AccountTable({ onEdit }) {
     };
   };
 
-  const handleDelete = (id) => {
-    if (
-      window.confirm(
-        "Are you sure you want to delete this account?"
-      )
-    ) {
-      deleteAccount(id);
-    }
-  };
 
   return (
     <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
@@ -272,7 +283,16 @@ export default function AccountTable({ onEdit }) {
 
         </table>
       </div>
-
+<ConfirmDialog
+  open={openConfirm}
+  title="Delete Account"
+  message="Are you sure you want to delete this account?"
+  onConfirm={confirmDelete}
+  onCancel={() => {
+    setOpenConfirm(false);
+    setSelectedId(null);
+  }}
+/>
     </div>
   );
 }
