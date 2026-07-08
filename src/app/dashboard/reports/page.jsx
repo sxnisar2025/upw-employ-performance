@@ -11,42 +11,23 @@ import ReportTable from "@/components/reports/ReportTable";
 import { exportReportToExcel } from "@/utils/exportExcel";
 import RecentTransactions from "@/components/dashboard/RecentTransactions";
 import PendingPayments from "@/components/dashboard/PendingPayments";
-<div className="grid gap-6 lg:grid-cols-2">
 
-    <RecentTransactions />
-
-    <PendingPayments />
-
-</div>
 
 export default function ReportsPage() {
-  const {
-  performances,
-  accounts,
-  employees,
-} = useApp();
-<ReportFilters />
 
+ const {
+    performances,
+    accounts,
+    employees,
+  } = useApp();
+  
   const [filters, setFilters] = useState({
     employeeId: "",
     accountId: "",
     fromDate: "",
     toDate: "",
   });
-  <div className="flex justify-end">
-  <button
-    onClick={() =>
-      exportReportToExcel(
-        filteredRecords,
-        employees,
-        accounts
-      )
-    }
-    className="rounded-lg bg-green-600 px-5 py-2 text-white hover:bg-green-700"
-  >
-    Export Excel
-  </button>
-</div>
+
 
 
   const filteredRecords = useMemo(() => {
@@ -96,19 +77,13 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
 
-      <PageHeader
-        title="Reports"
-        description="Employee, Account and Financial Reports"
-      />
+      <PageHeader  title="Reports" description="Employee, Account and Financial Reports"  />
 
-      <ReportFilters
-        filters={filters}
-        setFilters={setFilters}
-      />
+      <ReportFilters filters={filters} setFilters={setFilters} />
 
       <ReportSummary records={filteredRecords} />
 
-      <ReportTable records={filteredRecords} />
+       <ReportTable records={filteredRecords} /> 
 
     </div>
   );
