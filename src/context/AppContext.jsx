@@ -1,10 +1,12 @@
 "use client";
-
+import { supabase } from "@/lib/supabase";
 import { createContext, useContext, useEffect, useState } from "react";
 
 import employeesData from "@/data/employees";
 import accountsData from "@/data/accounts";
 import performancesData from "@/data/performances";
+
+
 
 const AppContext = createContext();
 
@@ -18,16 +20,11 @@ export function AppProvider({ children }) {
   ------------------------- */
 
   useEffect(() => {
-    const savedEmployees = localStorage.getItem("employees");
+   
     const savedAccounts = localStorage.getItem("accounts");
     const savedPerformances = localStorage.getItem("performances");
 
-    setEmployees(
-      savedEmployees
-        ? JSON.parse(savedEmployees)
-        : employeesData
-    );
-
+  
     setAccounts(
       savedAccounts
         ? JSON.parse(savedAccounts)
@@ -41,18 +38,14 @@ export function AppProvider({ children }) {
     );
   }, []);
 
+  useEffect(() => {
+  loadEmployees();
+}, []);
   /* -------------------------
       Save Local Storage
   ------------------------- */
 
-  useEffect(() => {
-    if (employees.length) {
-      localStorage.setItem(
-        "employees",
-        JSON.stringify(employees)
-      );
-    }
-  }, [employees]);
+
 
   useEffect(() => {
     if (accounts.length) {
@@ -76,44 +69,59 @@ export function AppProvider({ children }) {
         EMPLOYEE CRUD
   ========================== */
 
-  const addEmployee = (employee) => {
-    const newEmployee = {
-      id: Date.now(),
-      ...employee,
-    };
-
-    setEmployees((prev) => [...prev, newEmployee]);
+const addEmployee = async (employee) => {
+  // Never send id when creating a new employee
+  const employeeData = {
+    name: employee.name,
+    email: employee.email,
+    phone: employee.phone,
+    status: employee.status,
   };
 
-  const updateEmployee = (employee) => {
-    setEmployees((prev) =>
-      prev.map((item) =>
-        item.id === employee.id ? employee : item
-      )
-    );
-  };
+  const { data, error } = await supabase
+    .from("employees")
+    .insert([employeeData])
+    .select();
 
-  const deleteEmployee = (id) => {
-    setEmployees((prev) =>
-      prev.filter((item) => item.id !== id)
-    );
+  if (error) {
+    console.error(error);
+    alert(error.message);
+    return false;
+  }
 
-    // Remove employee accounts
-    setAccounts((prev) =>
-      prev.filter((acc) => acc.employeeId !== id)
-    );
+  loadEmployees();
+  return true;
+};
 
-    // Remove performance records
-    const accountIds = accounts
-      .filter((a) => a.employeeId === id)
-      .map((a) => a.id);
+const updateEmployee = async (employee) => {
+  const { id, ...values } = employee;
 
-    setPerformances((prev) =>
-      prev.filter(
-        (item) => !accountIds.includes(item.accountId)
-      )
-    );
-  };
+  const { error } = await supabase
+    .from("employees")
+    .update(values)
+    .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  loadEmployees();
+};
+
+const deleteEmployee = async (id) => {
+  const { error } = await supabase
+    .from("employees")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  loadEmployees();
+};
 
   /* ==========================
         ACCOUNT CRUD
@@ -176,6 +184,19 @@ export function AppProvider({ children }) {
       prev.filter((item) => item.id !== id)
     );
   };
+const loadEmployees = async () => {
+  const { data, error } = await supabase
+    .from("employees")
+    .select("*")
+    .order("id", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  setEmployees(data || []);
+};
 
   return (
     <AppContext.Provider

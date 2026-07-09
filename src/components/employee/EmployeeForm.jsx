@@ -58,13 +58,10 @@ export default function EmployeeForm({
       return;
     }
 
-    const employeeData = {
-      ...(employee && { id: employee.id }),
-      ...form,
-      joinedDate:
-        employee?.joinedDate ||
-        new Date().toISOString().split("T")[0],
-    };
+   const employeeData = {
+  ...(employee && { id: employee.id }),
+  ...form,
+};
 
     onSave(employeeData);
 
