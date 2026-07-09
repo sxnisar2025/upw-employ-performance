@@ -24,20 +24,27 @@ export default function AccountForm({
 
   useEffect(() => {
     if (account) {
-      setForm(account);
+      setForm({
+        ...initialState,
+        ...account,
+      });
     } else {
       setForm(initialState);
     }
   }, [account]);
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]:
-        e.target.name === "employeeId"
-          ? Number(e.target.value)
-          : e.target.value,
-    });
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]:
+        name === "employeeId"
+          ? value === ""
+            ? ""
+            : Number(value)
+          : value,
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -68,6 +75,8 @@ export default function AccountForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
 
+      {/* Employee */}
+
       <div>
         <label className="mb-2 block text-sm font-medium">
           Employee
@@ -75,7 +84,7 @@ export default function AccountForm({
 
         <select
           name="employeeId"
-          value={form.employeeId}
+          value={form.employeeId ?? ""}
           onChange={handleChange}
           className="w-full rounded-lg border border-gray-300 px-4 py-2"
         >
@@ -92,21 +101,27 @@ export default function AccountForm({
         </select>
       </div>
 
+      {/* Account Name */}
+
       <Input
         label="Account Name"
         name="name"
-        value={form.name}
+        value={form.name ?? ""}
         onChange={handleChange}
         placeholder="Graphic Designing"
       />
 
+      {/* Category */}
+
       <Input
         label="Category"
         name="category"
-        value={form.category}
+        value={form.category ?? ""}
         onChange={handleChange}
         placeholder="Graphic Designing"
       />
+
+      {/* Status */}
 
       <div>
         <label className="mb-2 block text-sm font-medium">
@@ -115,14 +130,16 @@ export default function AccountForm({
 
         <select
           name="status"
-          value={form.status}
+          value={form.status ?? "Active"}
           onChange={handleChange}
           className="w-full rounded-lg border border-gray-300 px-4 py-2"
         >
-          <option>Active</option>
-          <option>Inactive</option>
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
         </select>
       </div>
+
+      {/* Buttons */}
 
       <div className="flex justify-end gap-3">
         <Button

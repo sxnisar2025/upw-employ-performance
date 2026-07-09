@@ -133,11 +133,11 @@ const pending = records.reduce(
                 Status
               </th>
 
-              <th className="px-5 py-3 text-right">
+              {/*<th className="px-5 py-3 text-right">
                 Connect Cost
               </th>
 
-              <th className="px-5 py-3 text-right">
+               <th className="px-5 py-3 text-right">
                 Gross Earn
               </th>
 
@@ -155,7 +155,7 @@ const pending = records.reduce(
 
               <th className="px-5 py-3 text-right">
                 Net Profit
-              </th>
+              </th> */}
 
               <th className="px-5 py-3 text-center">
                 Actions
@@ -207,7 +207,7 @@ const pending = records.reduce(
                       {account.category}
                     </td>
 
-                    <td className="px-5 py-4 text-center">
+                     <td className="px-5 py-4 text-center">
                       <span
                         className={`rounded-full px-3 py-1 text-xs font-semibold ${
                           account.status === "Active"
@@ -219,7 +219,7 @@ const pending = records.reduce(
                       </span>
                     </td>
 
-                    <td className="px-5 py-4 text-right">
+                   {/* <td className="px-5 py-4 text-right">
                       ${summary.connectCost}
                     </td>
 
@@ -241,7 +241,7 @@ const pending = records.reduce(
 
                     <td className="px-5 py-4 text-right font-semibold text-blue-600">
                       ${summary.netProfit}
-                    </td>
+                    </td> */}
 
                     <td className="px-5 py-4">
                       <div className="flex justify-center gap-3">

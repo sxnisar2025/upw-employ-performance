@@ -84,12 +84,12 @@ return (
     <th className="px-6 py-3 text-left">Phone</th>
     <th className="px-6 py-3 text-center">Status</th>
     <th className="px-6 py-3 text-center">Accounts</th>
-    <th className="px-6 py-3 text-right">Connect Cost</th>
-    <th className="px-6 py-3 text-right">Gross Earn</th>
+    {/*<th className="px-6 py-3 text-right">Connect Cost</th>
+     <th className="px-6 py-3 text-right">Gross Earn</th>
     <th className="px-6 py-3 text-right">Received</th>
     <th className="px-6 py-3 text-right">Pending</th>
     <th className="px-6 py-3 text-right">Gross Profit</th>
-    <th className="px-6 py-3 text-right">Net Profit</th>
+    <th className="px-6 py-3 text-right">Net Profit</th> */}
     <th className="px-6 py-3 text-center">Action</th>
   </tr>
 </thead>
@@ -147,7 +147,7 @@ return (
     {summary.accounts}
   </td>
 
-  <td className="px-6 py-4 text-right">
+  {/* <td className="px-6 py-4 text-right">
     ${summary.connectCost}
   </td>
 
@@ -169,7 +169,7 @@ return (
 
   <td className="px-6 py-4 text-right font-semibold text-blue-600">
     ${summary.netProfit}
-  </td>
+  </td> */}
 
   <td className="px-6 py-4">
     <div className="flex justify-center gap-4">

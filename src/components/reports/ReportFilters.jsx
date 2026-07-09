@@ -2,98 +2,101 @@
 
 import { useApp } from "@/context/AppContext";
 
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 export default function ReportFilters({
   filters,
   setFilters,
 }) {
   const { employees, accounts } = useApp();
 
-  const handleChange = (e) => {
-    setFilters({
-      ...filters,
-      [e.target.name]: e.target.value,
-    });
-  };
-
   return (
-    <div className="grid gap-4 rounded-xl border bg-white p-5 md:grid-cols-4">
+    <div className="grid gap-4 rounded-lg bg-white p-4 shadow md:grid-cols-3">
 
-      <div>
-        <label className="mb-2 block text-sm font-medium">
-          Employee
-        </label>
+      {/* Employee */}
 
-        <select
-          name="employeeId"
-          value={filters.employeeId}
-          onChange={handleChange}
-          className="w-full rounded-lg border p-2"
-        >
-          <option value="">All Employees</option>
+      <select
+        value={filters.employeeId}
+        onChange={(e) =>
+          setFilters({
+            ...filters,
+            employeeId: e.target.value,
+          })
+        }
+        className="rounded-lg border p-2"
+      >
+        <option value="">All Employees</option>
 
-          {employees.map((employee) => (
-            <option
-              key={employee.id}
-              value={employee.id}
-            >
-              {employee.name}
-            </option>
-          ))}
-        </select>
-      </div>
+        {employees.map((employee) => (
+          <option
+            key={employee.id}
+            value={employee.id}
+          >
+            {employee.name}
+          </option>
+        ))}
+      </select>
 
-      <div>
-        <label className="mb-2 block text-sm font-medium">
-          Account
-        </label>
+      {/* Account */}
 
-        <select
-          name="accountId"
-          value={filters.accountId}
-          onChange={handleChange}
-          className="w-full rounded-lg border p-2"
-        >
-          <option value="">All Accounts</option>
+      <select
+        value={filters.accountId}
+        onChange={(e) =>
+          setFilters({
+            ...filters,
+            accountId: e.target.value,
+          })
+        }
+        className="rounded-lg border p-2"
+      >
+        <option value="">All Accounts</option>
 
-          {accounts.map((account) => (
-            <option
-              key={account.id}
-              value={account.id}
-            >
-              {account.name}
-            </option>
-          ))}
-        </select>
-      </div>
+        {accounts.map((account) => (
+          <option
+            key={account.id}
+            value={account.id}
+          >
+            {account.name}
+          </option>
+        ))}
+      </select>
 
-      <div>
-        <label className="mb-2 block text-sm font-medium">
-          From Date
-        </label>
+      {/* Month */}
 
-        <input
-          type="date"
-          name="fromDate"
-          value={filters.fromDate}
-          onChange={handleChange}
-          className="w-full rounded-lg border p-2"
-        />
-      </div>
+      <select
+        value={filters.month}
+        onChange={(e) =>
+          setFilters({
+            ...filters,
+            month: e.target.value,
+          })
+        }
+        className="rounded-lg border p-2"
+      >
+        <option value="">All Months</option>
 
-      <div>
-        <label className="mb-2 block text-sm font-medium">
-          To Date
-        </label>
-
-        <input
-          type="date"
-          name="toDate"
-          value={filters.toDate}
-          onChange={handleChange}
-          className="w-full rounded-lg border p-2"
-        />
-      </div>
-
+        {months.map((month) => (
+          <option
+            key={month}
+            value={month}
+          >
+            {month}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }

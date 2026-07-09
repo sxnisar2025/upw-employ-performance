@@ -8,27 +8,15 @@ import PageHeader from "@/components/ui/PageHeader";
 import ReportFilters from "@/components/reports/ReportFilters";
 import ReportSummary from "@/components/reports/ReportSummary";
 import ReportTable from "@/components/reports/ReportTable";
-import { exportReportToExcel } from "@/utils/exportExcel";
-import RecentTransactions from "@/components/dashboard/RecentTransactions";
-import PendingPayments from "@/components/dashboard/PendingPayments";
-
 
 export default function ReportsPage() {
+  const { performances, accounts } = useApp();
 
- const {
-    performances,
-    accounts,
-    employees,
-  } = useApp();
-  
   const [filters, setFilters] = useState({
     employeeId: "",
     accountId: "",
-    fromDate: "",
-    toDate: "",
+    month: "",
   });
-
-
 
   const filteredRecords = useMemo(() => {
     return performances.filter((record) => {
@@ -38,7 +26,6 @@ export default function ReportsPage() {
 
       if (!account) return false;
 
-      // Employee Filter
       if (
         filters.employeeId &&
         account.employeeId !== Number(filters.employeeId)
@@ -46,7 +33,6 @@ export default function ReportsPage() {
         return false;
       }
 
-      // Account Filter
       if (
         filters.accountId &&
         record.accountId !== Number(filters.accountId)
@@ -54,18 +40,9 @@ export default function ReportsPage() {
         return false;
       }
 
-      // From Date
       if (
-        filters.fromDate &&
-        record.date < filters.fromDate
-      ) {
-        return false;
-      }
-
-      // To Date
-      if (
-        filters.toDate &&
-        record.date > filters.toDate
+        filters.month &&
+        record.month !== filters.month
       ) {
         return false;
       }
@@ -76,15 +53,19 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-6">
+      <PageHeader
+        title="Reports"
+        description="Employee & Account Monthly Reports"
+      />
 
-      <PageHeader  title="Reports" description="Employee, Account and Financial Reports"  />
-
-      <ReportFilters filters={filters} setFilters={setFilters} />
+      <ReportFilters
+        filters={filters}
+        setFilters={setFilters}
+      />
 
       <ReportSummary records={filteredRecords} />
 
-       <ReportTable records={filteredRecords} /> 
-
+      <ReportTable records={filteredRecords} />
     </div>
   );
 }

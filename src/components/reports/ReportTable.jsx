@@ -10,9 +10,9 @@ export default function ReportTable({ records }) {
       <table className="min-w-full border-collapse">
         <thead className="bg-gray-100">
           <tr>
-            <th className="border px-4 py-2 text-left">Month</th>
-            <th className="border px-4 py-2 text-left">Employee</th>
-            <th className="border px-4 py-2 text-left">Account</th>
+            <th className="border px-4 py-2">Month</th>
+            <th className="border px-4 py-2">Employee</th>
+            <th className="border px-4 py-2">Account</th>
             <th className="border px-4 py-2 text-right">Buy</th>
             <th className="border px-4 py-2 text-right">Earn</th>
             <th className="border px-4 py-2 text-right">Received</th>
@@ -25,7 +25,7 @@ export default function ReportTable({ records }) {
             <tr>
               <td
                 colSpan={7}
-                className="border py-6 text-center text-gray-500"
+                className="py-6 text-center"
               >
                 No records found.
               </td>
@@ -41,17 +41,17 @@ export default function ReportTable({ records }) {
               );
 
               return (
-                <tr key={record.id} className="hover:bg-gray-50">
+                <tr key={record.id}>
                   <td className="border px-4 py-2">
                     {record.month}
                   </td>
 
                   <td className="border px-4 py-2">
-                    {employee?.name || "-"}
+                    {employee?.name ?? "-"}
                   </td>
 
                   <td className="border px-4 py-2">
-                    {account?.name || "-"}
+                    {account?.name ?? "-"}
                   </td>
 
                   <td className="border px-4 py-2 text-right">
