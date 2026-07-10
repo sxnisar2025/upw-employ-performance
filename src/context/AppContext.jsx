@@ -15,6 +15,20 @@ export function AppProvider({ children }) {
   const [accounts, setAccounts] = useState([]);
   const [performances, setPerformances] = useState([]);
 
+  const loadAccounts = async () => {
+  const { data, error } = await supabase
+    .from("accounts")
+    .select("*")
+    .order("id", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  setAccounts(data || []);
+};
+
   /* -------------------------
       Load Local Storage
   ------------------------- */
@@ -38,8 +52,9 @@ export function AppProvider({ children }) {
     );
   }, []);
 
-  useEffect(() => {
+ useEffect(() => {
   loadEmployees();
+  loadAccounts();
 }, []);
   /* -------------------------
       Save Local Storage
@@ -127,33 +142,58 @@ const deleteEmployee = async (id) => {
         ACCOUNT CRUD
   ========================== */
 
-  const addAccount = (account) => {
-    setAccounts((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        ...account,
-      },
-    ]);
+const addAccount = async (account) => {
+  const accountData = {
+    employeeId: account.employeeId,
+    name: account.name,
+    category: account.category,
+    status: account.status,
   };
 
-  const updateAccount = (account) => {
-    setAccounts((prev) =>
-      prev.map((item) =>
-        item.id === account.id ? account : item
-      )
-    );
-  };
+  const { error } = await supabase
+    .from("accounts")
+    .insert([accountData]);
 
-  const deleteAccount = (id) => {
-    setAccounts((prev) =>
-      prev.filter((item) => item.id !== id)
-    );
+  if (error) {
+    alert(error.message);
+    return false;
+  }
 
-    setPerformances((prev) =>
-      prev.filter((item) => item.accountId !== id)
-    );
-  };
+  await loadAccounts();
+  return true;
+};
+
+const updateAccount = async (account) => {
+  const { id, ...values } = account;
+
+  const { error } = await supabase
+    .from("accounts")
+    .update(values)
+    .eq("id", id);
+
+  if (error) {
+    alert(error.message);
+    return false;
+  }
+
+  await loadAccounts();
+  return true;
+};
+
+ const deleteAccount = async (id) => {
+  const { error } = await supabase
+    .from("accounts")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert(error.message);
+    return false;
+  }
+
+  await loadAccounts();
+  return true;
+};
 
   /* ==========================
       PERFORMANCE CRUD
