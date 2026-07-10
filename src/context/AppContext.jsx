@@ -2,9 +2,7 @@
 import { supabase } from "@/lib/supabase";
 import { createContext, useContext, useEffect, useState } from "react";
 
-import employeesData from "@/data/employees";
-import accountsData from "@/data/accounts";
-import performancesData from "@/data/performances";
+
 
 
 
@@ -29,56 +27,32 @@ export function AppProvider({ children }) {
   setAccounts(data || []);
 };
 
+const loadPerformances = async () => {
+  const { data, error } = await supabase
+    .from("performances")
+    .select("*")
+    .order("id", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  setPerformances(data || []);
+};
   /* -------------------------
       Load Local Storage
   ------------------------- */
 
-  useEffect(() => {
-   
-    const savedAccounts = localStorage.getItem("accounts");
-    const savedPerformances = localStorage.getItem("performances");
 
-  
-    setAccounts(
-      savedAccounts
-        ? JSON.parse(savedAccounts)
-        : accountsData
-    );
-
-    setPerformances(
-      savedPerformances
-        ? JSON.parse(savedPerformances)
-        : performancesData
-    );
-  }, []);
-
- useEffect(() => {
+useEffect(() => {
   loadEmployees();
   loadAccounts();
+  loadPerformances();
 }, []);
   /* -------------------------
       Save Local Storage
   ------------------------- */
-
-
-
-  useEffect(() => {
-    if (accounts.length) {
-      localStorage.setItem(
-        "accounts",
-        JSON.stringify(accounts)
-      );
-    }
-  }, [accounts]);
-
-  useEffect(() => {
-    if (performances.length) {
-      localStorage.setItem(
-        "performances",
-        JSON.stringify(performances)
-      );
-    }
-  }, [performances]);
 
   /* ==========================
         EMPLOYEE CRUD
@@ -199,31 +173,65 @@ const updateAccount = async (account) => {
       PERFORMANCE CRUD
   ========================== */
 
-  const addPerformance = (performance) => {
-    setPerformances((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        ...performance,
-      },
-    ]);
+const addPerformance = async (performance) => {
+  const performanceData = {
+    accountId: performance.accountId,
+    month: performance.month,
+    buy: performance.buy,
+    earn: performance.earn,
+    received: performance.received,
+    pending: performance.pending,
   };
 
-  const updatePerformance = (performance) => {
-    setPerformances((prev) =>
-      prev.map((item) =>
-        item.id === performance.id
-          ? performance
-          : item
-      )
-    );
-  };
+  const { data, error } = await supabase
+    .from("performances")
+    .insert([performanceData])
+    .select();
 
-  const deletePerformance = (id) => {
-    setPerformances((prev) =>
-      prev.filter((item) => item.id !== id)
-    );
-  };
+  console.log("Inserted:", data);
+  console.log("Error:", error);
+
+  if (error) {
+    console.error(error);
+    alert(error.message);
+    return false;
+  }
+
+  await loadPerformances();
+  return true;
+};
+
+const updatePerformance = async (performance) => {
+  const { id, ...values } = performance;
+
+  const { error } = await supabase
+    .from("performances")
+    .update(values)
+    .eq("id", id);
+
+  if (error) {
+    alert(error.message);
+    return false;
+  }
+
+  await loadPerformances();
+  return true;
+};
+
+const deletePerformance = async (id) => {
+  const { error } = await supabase
+    .from("performances")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert(error.message);
+    return false;
+  }
+
+  await loadPerformances();
+  return true;
+};
 const loadEmployees = async () => {
   const { data, error } = await supabase
     .from("employees")

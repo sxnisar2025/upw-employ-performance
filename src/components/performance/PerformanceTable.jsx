@@ -65,15 +65,12 @@ export default function PerformanceTable({ onEdit }) {
       </div>
 
       <div className="overflow-x-auto">
-
         <table className="min-w-full">
 
           <thead className="bg-gray-100">
-
             <tr>
-
               <th className="px-4 py-3 text-left">
-                Date
+                Month
               </th>
 
               <th className="px-4 py-3 text-left">
@@ -85,11 +82,11 @@ export default function PerformanceTable({ onEdit }) {
               </th>
 
               <th className="px-4 py-3 text-right">
-                Connect Cost
+                Buy
               </th>
 
               <th className="px-4 py-3 text-right">
-                Gross Earn
+                Earn
               </th>
 
               <th className="px-4 py-3 text-right">
@@ -111,28 +108,21 @@ export default function PerformanceTable({ onEdit }) {
               <th className="px-4 py-3 text-center">
                 Action
               </th>
-
             </tr>
-
           </thead>
 
           <tbody>
 
             {filteredData.length === 0 ? (
-
               <tr>
-
                 <td
                   colSpan={10}
                   className="py-8 text-center text-gray-500"
                 >
                   No records found.
                 </td>
-
               </tr>
-
             ) : (
-
               filteredData.map((record) => {
 
                 const account = accounts.find(
@@ -144,58 +134,56 @@ export default function PerformanceTable({ onEdit }) {
                 );
 
                 const grossProfit =
-                  Number(record.grossEarn) -
-                  Number(record.connectCost);
+                  Number(record.earn) -
+                  Number(record.buy);
 
                 const netProfit =
-                  Number(record.receivedAmount) -
-                  Number(record.connectCost);
+                  Number(record.received) -
+                  Number(record.buy);
 
                 return (
-
                   <tr
                     key={record.id}
                     className="border-t hover:bg-gray-50"
                   >
 
                     <td className="px-4 py-3">
-                      {record.date}
+                      {record.month}
                     </td>
 
                     <td className="px-4 py-3">
-                      {employee?.name}
+                      {employee?.name || "-"}
                     </td>
 
                     <td className="px-4 py-3">
-                      {account?.name}
+                      {account?.name || "-"}
                     </td>
 
                     <td className="px-4 py-3 text-right">
-                      ${record.connectCost}
+                      ${record.buy}
                     </td>
 
                     <td className="px-4 py-3 text-right">
-                      ${record.grossEarn}
+                      ${record.earn}
                     </td>
 
                     <td className="px-4 py-3 text-right">
-                      ${record.receivedAmount}
+                      ${record.received}
                     </td>
 
                     <td className="px-4 py-3 text-right">
-                      ${record.pendingAmount}
+                      ${record.pending}
                     </td>
 
-                    <td className="px-4 py-3 text-right text-green-600 font-semibold">
+                    <td className="px-4 py-3 text-right font-semibold text-green-600">
                       ${grossProfit}
                     </td>
 
-                    <td className="px-4 py-3 text-right text-blue-600 font-semibold">
+                    <td className="px-4 py-3 text-right font-semibold text-blue-600">
                       ${netProfit}
                     </td>
 
                     <td className="px-4 py-3">
-
                       <div className="flex justify-center gap-3">
 
                         <Pencil
@@ -207,24 +195,22 @@ export default function PerformanceTable({ onEdit }) {
                         <Trash2
                           size={18}
                           className="cursor-pointer text-red-600"
-                          onClick={() => handleDelete(record.id)}
+                          onClick={() =>
+                            handleDelete(record.id)
+                          }
                         />
 
                       </div>
-
                     </td>
 
                   </tr>
-
                 );
               })
-
             )}
 
           </tbody>
 
         </table>
-
       </div>
 
     </div>

@@ -15,68 +15,69 @@ export default function PerformanceForm({
 
   const initialState = {
     accountId: "",
-    date: "",
-    connectCost: "",
-    grossEarn: "",
-    receivedAmount: "",
-    pendingAmount: "",
-    notes: "",
+    month: "",
+    buy: "",
+    earn: "",
+    received: "",
+    pending: "",
   };
 
   const [form, setForm] = useState(initialState);
 
   useEffect(() => {
     if (performance) {
-      setForm(performance);
-    } else {
       setForm({
-        ...initialState,
-        date: new Date().toISOString().split("T")[0],
+        accountId: performance.accountId,
+        month: performance.month,
+        buy: performance.buy,
+        earn: performance.earn,
+        received: performance.received,
+        pending: performance.pending,
       });
+    } else {
+      setForm(initialState);
     }
   }, [performance]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       [name]:
         name === "accountId"
           ? Number(value)
           : value,
-    });
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!form.accountId) {
-      alert("Select account");
+      alert("Please select an account.");
+      return;
+    }
+
+    if (!form.month) {
+      alert("Please select a month.");
       return;
     }
 
     onSave({
-      ...form,
-      connectCost: Number(form.connectCost),
-      grossEarn: Number(form.grossEarn),
-      receivedAmount: Number(form.receivedAmount),
-      pendingAmount: Number(form.pendingAmount),
+      ...(performance && { id: performance.id }),
+      accountId: Number(form.accountId),
+      month: form.month,
+      buy: Number(form.buy),
+      earn: Number(form.earn),
+      received: Number(form.received),
+      pending: Number(form.pending),
     });
-
-    if (!performance) {
-      setForm({
-        ...initialState,
-        date: new Date().toISOString().split("T")[0],
-      });
-    }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-5"
-    >
+    <form onSubmit={handleSubmit} className="space-y-5">
+
       <div>
         <label className="mb-2 block font-medium">
           Account
@@ -96,10 +97,7 @@ export default function PerformanceForm({
             );
 
             return (
-              <option
-                key={account.id}
-                value={account.id}
-              >
+              <option key={account.id} value={account.id}>
                 {employee?.name} - {account.name}
               </option>
             );
@@ -107,74 +105,79 @@ export default function PerformanceForm({
         </select>
       </div>
 
-      <Input
-        label="Date"
-        type="date"
-        name="date"
-        value={form.date}
-        onChange={handleChange}
-      />
-
-      <Input
-        label="Connect Cost ($)"
-        type="number"
-        name="connectCost"
-        value={form.connectCost}
-        onChange={handleChange}
-      />
-
-      <Input
-        label="Gross Earn ($)"
-        type="number"
-        name="grossEarn"
-        value={form.grossEarn}
-        onChange={handleChange}
-      />
-
-      <Input
-        label="Received Amount ($)"
-        type="number"
-        name="receivedAmount"
-        value={form.receivedAmount}
-        onChange={handleChange}
-      />
-
-      <Input
-        label="Pending Amount ($)"
-        type="number"
-        name="pendingAmount"
-        value={form.pendingAmount}
-        onChange={handleChange}
-      />
-
       <div>
         <label className="mb-2 block font-medium">
-          Notes
+          Month
         </label>
 
-        <textarea
-          rows="4"
-          name="notes"
-          value={form.notes}
+        <select
+          name="month"
+          value={form.month}
           onChange={handleChange}
           className="w-full rounded-lg border p-3"
-        />
+        >
+          <option value="">Select Month</option>
+          <option>January</option>
+          <option>February</option>
+          <option>March</option>
+          <option>April</option>
+          <option>May</option>
+          <option>June</option>
+          <option>July</option>
+          <option>August</option>
+          <option>September</option>
+          <option>October</option>
+          <option>November</option>
+          <option>December</option>
+        </select>
       </div>
+
+      <Input
+        label="Buy ($)"
+        type="number"
+        name="buy"
+        value={form.buy}
+        onChange={handleChange}
+      />
+
+      <Input
+        label="Earn ($)"
+        type="number"
+        name="earn"
+        value={form.earn}
+        onChange={handleChange}
+      />
+
+      <Input
+        label="Received ($)"
+        type="number"
+        name="received"
+        value={form.received}
+        onChange={handleChange}
+      />
+
+      <Input
+        label="Pending ($)"
+        type="number"
+        name="pending"
+        value={form.pending}
+        onChange={handleChange}
+      />
 
       <div className="flex justify-end gap-3">
         <Button
           type="button"
+          variant="secondary"
           onClick={onCancel}
         >
           Cancel
         </Button>
 
         <Button type="submit">
-          {performance
-            ? "Update Record"
-            : "Save Record"}
+          {performance ? "Update Record" : "Save Record"}
         </Button>
       </div>
+
     </form>
   );
 }
