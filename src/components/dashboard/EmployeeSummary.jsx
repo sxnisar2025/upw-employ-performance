@@ -1,4 +1,5 @@
 import { employees } from "@/data/mockData";
+const { employees, accounts, performances } = useApp();
 import { calculateEmployeeSummary } from "@/utils/calculations";
 export default function EmployeeSummary() {
   const summary = employees.map((employee) => ({

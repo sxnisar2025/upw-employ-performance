@@ -1,15 +1,15 @@
 "use client";
 
 export default function ReportSummary({ records = [] }) {
-  const summary = records.reduce(
-    (acc, item) => {
-      acc.connectCost += Number(item.connectCost || 0);
-      acc.grossEarn += Number(item.grossEarn || 0);
-      acc.received += Number(item.receivedAmount || 0);
-      acc.pending += Number(item.pendingAmount || 0);
+ const summary = records.reduce(
+  (acc, item) => {
+    acc.connectCost += Number(item.buy || 0);
+    acc.grossEarn += Number(item.earn || 0);
+    acc.received += Number(item.received || 0);
+    acc.pending += Number(item.pending || 0);
 
-      return acc;
-    },
+    return acc;
+  },
     {
       connectCost: 0,
       grossEarn: 0,

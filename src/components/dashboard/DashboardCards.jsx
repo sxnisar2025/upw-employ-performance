@@ -1,4 +1,4 @@
-import employees from "@/data/employees";
+const { employees, accounts, performances } = useApp();
 import { calculateDashboardSummary } from "@/utils/calculations";
 
 import StatCard from "./StatCard";
