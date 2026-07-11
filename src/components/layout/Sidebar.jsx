@@ -64,8 +64,9 @@ export default function Sidebar() {
           const Icon = menu.icon;
 
           const active =
-            pathname === menu.href ||
-            pathname.startsWith(menu.href + "/");
+  menu.href === "/dashboard"
+    ? pathname === "/dashboard"
+    : pathname.startsWith(menu.href);
 
           return (
             <Link

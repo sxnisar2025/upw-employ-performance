@@ -1,7 +1,11 @@
 "use client";
 
+import { useState } from "react";
+
 import { useApp } from "@/context/AppContext";
 import { getDashboardStats } from "@/utils/dashboard";
+
+import DashboardFilters from "@/components/dashboard/DashboardFilters";
 import StatCard from "@/components/dashboard/StatCard";
 
 export default function DashboardPage() {
@@ -11,10 +15,41 @@ export default function DashboardPage() {
     performances,
   } = useApp();
 
+  // Filters
+  const [employeeFilter, setEmployeeFilter] = useState("");
+  const [accountFilter, setAccountFilter] = useState("");
+  const [monthFilter, setMonthFilter] = useState("");
+
+  // Filter performance records
+  const filteredPerformance = performances.filter((item) => {
+    const account = accounts.find(
+      (a) => a.id === item.accountId
+    );
+
+    const employeeId = account?.employeeId;
+
+    const itemMonth = item.date
+      ? new Date(item.date).toLocaleString("default", {
+          month: "long",
+        })
+      : "";
+
+    return (
+      (!employeeFilter ||
+        String(employeeId) === String(employeeFilter)) &&
+
+      (!accountFilter ||
+        String(item.accountId) === String(accountFilter)) &&
+
+      (!monthFilter || itemMonth === monthFilter)
+    );
+  });
+
+  // Dashboard statistics
   const stats = getDashboardStats(
     employees,
     accounts,
-    performances
+    filteredPerformance
   );
 
   return (
@@ -29,6 +64,17 @@ export default function DashboardPage() {
           Upwork Employee Management Dashboard
         </p>
       </div>
+
+      <DashboardFilters
+        employees={employees}
+        accounts={accounts}
+        employeeFilter={employeeFilter}
+        accountFilter={accountFilter}
+        monthFilter={monthFilter}
+        setEmployeeFilter={setEmployeeFilter}
+        setAccountFilter={setAccountFilter}
+        setMonthFilter={setMonthFilter}
+      />
 
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
 
