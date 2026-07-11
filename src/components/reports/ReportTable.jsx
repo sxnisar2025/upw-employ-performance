@@ -17,6 +17,12 @@ export default function ReportTable({ records }) {
             <th className="border px-4 py-2 text-right">Earn</th>
             <th className="border px-4 py-2 text-right">Received</th>
             <th className="border px-4 py-2 text-right">Pending</th>
+            <th className="border px-4 py-2 text-right">
+              Gross Profit
+            </th>
+            <th className="border px-4 py-2 text-right">
+              Net Profit
+            </th>
           </tr>
         </thead>
 
@@ -24,7 +30,7 @@ export default function ReportTable({ records }) {
           {records.length === 0 ? (
             <tr>
               <td
-                colSpan={7}
+                colSpan={9}
                 className="py-6 text-center"
               >
                 No records found.
@@ -39,6 +45,14 @@ export default function ReportTable({ records }) {
               const employee = employees.find(
                 (e) => e.id === account?.employeeId
               );
+
+              const grossProfit =
+                Number(record.earn || 0) -
+                Number(record.buy || 0);
+
+              const netProfit =
+                Number(record.received || 0) -
+                Number(record.buy || 0);
 
               return (
                 <tr key={record.id}>
@@ -55,19 +69,27 @@ export default function ReportTable({ records }) {
                   </td>
 
                   <td className="border px-4 py-2 text-right">
-                    {record.buy}
+                    ${Number(record.buy).toFixed(2)}
                   </td>
 
                   <td className="border px-4 py-2 text-right">
-                    ${record.earn}
+                    ${Number(record.earn).toFixed(2)}
                   </td>
 
                   <td className="border px-4 py-2 text-right">
-                    ${record.received}
+                    ${Number(record.received).toFixed(2)}
                   </td>
 
                   <td className="border px-4 py-2 text-right">
-                    ${record.pending}
+                    ${Number(record.pending).toFixed(2)}
+                  </td>
+
+                  <td className="border px-4 py-2 text-right font-semibold text-green-600">
+                    ${grossProfit.toFixed(2)}
+                  </td>
+
+                  <td className="border px-4 py-2 text-right font-semibold text-blue-600">
+                    ${netProfit.toFixed(2)}
                   </td>
                 </tr>
               );
