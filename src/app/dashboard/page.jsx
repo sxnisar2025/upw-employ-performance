@@ -28,11 +28,7 @@ export default function DashboardPage() {
 
     const employeeId = account?.employeeId;
 
-    const itemMonth = item.date
-      ? new Date(item.date).toLocaleString("default", {
-          month: "long",
-        })
-      : "";
+ const itemMonth = item.month || "";
 
     return (
       (!employeeFilter ||
