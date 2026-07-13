@@ -10,6 +10,7 @@ import Modal from "@/components/ui/Modal";
 
 import AccountTable from "@/components/account/AccountTable";
 import AccountForm from "@/components/account/AccountForm";
+import RoleGuard from "@/components/RoleGuard";
 
 export default function AccountsPage() {
   const { addAccount, updateAccount } = useApp();
@@ -79,5 +80,13 @@ export default function AccountsPage() {
         />
       </Modal>
     </div>
+    
+  );
+   return (
+    <RoleGuard adminOnly>
+
+      {/* Existing Accounts Page */}
+
+    </RoleGuard>
   );
 }

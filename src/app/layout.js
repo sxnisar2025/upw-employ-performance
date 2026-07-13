@@ -1,10 +1,9 @@
 import "./globals.css";
+
+import { AuthProvider } from "@/context/AuthContext";
 import { AppProvider } from "@/context/AppContext";
+
 import { Toaster } from "react-hot-toast";
-<Toaster
-  position="top-right"
-  reverseOrder={false}
-/>
 
 export const metadata = {
   title: "Upwork Employee Record",
@@ -15,14 +14,16 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <AppProvider>
-          {children}
+        <AuthProvider>
+          <AppProvider>
+            {children}
 
-          <Toaster
-            position="top-right"
-            reverseOrder={false}
-          />
-        </AppProvider>
+            <Toaster
+              position="top-right"
+              reverseOrder={false}
+            />
+          </AppProvider>
+        </AuthProvider>
       </body>
     </html>
   );

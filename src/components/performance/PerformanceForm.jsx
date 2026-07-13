@@ -91,17 +91,29 @@ export default function PerformanceForm({
         >
           <option value="">Select Account</option>
 
-          {accounts.map((account) => {
-            const employee = employees.find(
-              (e) => e.id === account.employeeId
-            );
+          {accounts
+            .filter((account) => {
+              const employee = employees.find(
+                (e) => e.id === account.employeeId
+              );
 
-            return (
-              <option key={account.id} value={account.id}>
-                {employee?.name} - {account.name}
-              </option>
-            );
-          })}
+              // Hide Admin accounts
+              return employee && employee.role !== "admin";
+            })
+            .map((account) => {
+              const employee = employees.find(
+                (e) => e.id === account.employeeId
+              );
+
+              return (
+                <option
+                  key={account.id}
+                  value={account.id}
+                >
+                  {employee?.name} - {account.name}
+                </option>
+              );
+            })}
         </select>
       </div>
 
@@ -117,6 +129,7 @@ export default function PerformanceForm({
           className="w-full rounded-lg border p-3"
         >
           <option value="">Select Month</option>
+
           <option>January</option>
           <option>February</option>
           <option>March</option>

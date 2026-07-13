@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
+
 import { useApp } from "@/context/AppContext";
+import { useAuth } from "@/context/AuthContext";
+
 import SearchInput from "@/components/ui/SearchInput";
 
 export default function PerformanceTable({ onEdit }) {
@@ -13,6 +16,10 @@ export default function PerformanceTable({ onEdit }) {
     deletePerformance,
   } = useApp();
 
+  const { employee } = useAuth();
+
+  const isAdmin = employee?.role === "admin";
+
   const [search, setSearch] = useState("");
 
   const filteredData = performances.filter((record) => {
@@ -20,11 +27,11 @@ export default function PerformanceTable({ onEdit }) {
       (a) => a.id === record.accountId
     );
 
-    const employee = employees.find(
+    const emp = employees.find(
       (e) => e.id === account?.employeeId
     );
 
-    const employeeName = employee?.name || "";
+    const employeeName = emp?.name || "";
     const accountName = account?.name || "";
 
     return (
@@ -69,6 +76,7 @@ export default function PerformanceTable({ onEdit }) {
 
           <thead className="bg-gray-100">
             <tr>
+
               <th className="px-4 py-3 text-left">
                 Month
               </th>
@@ -105,9 +113,12 @@ export default function PerformanceTable({ onEdit }) {
                 Net Profit
               </th>
 
-              <th className="px-4 py-3 text-center">
-                Action
-              </th>
+              {isAdmin && (
+                <th className="px-4 py-3 text-center">
+                  Action
+                </th>
+              )}
+
             </tr>
           </thead>
 
@@ -116,7 +127,7 @@ export default function PerformanceTable({ onEdit }) {
             {filteredData.length === 0 ? (
               <tr>
                 <td
-                  colSpan={10}
+                  colSpan={isAdmin ? 10 : 9}
                   className="py-8 text-center text-gray-500"
                 >
                   No records found.
@@ -129,17 +140,17 @@ export default function PerformanceTable({ onEdit }) {
                   (a) => a.id === record.accountId
                 );
 
-                const employee = employees.find(
+                const emp = employees.find(
                   (e) => e.id === account?.employeeId
                 );
 
                 const grossProfit =
-                  Number(record.earn) -
-                  Number(record.buy);
+                  Number(record.earn || 0) -
+                  Number(record.buy || 0);
 
                 const netProfit =
-                  Number(record.received) -
-                  Number(record.buy);
+                  Number(record.received || 0) -
+                  Number(record.buy || 0);
 
                 return (
                   <tr
@@ -152,7 +163,7 @@ export default function PerformanceTable({ onEdit }) {
                     </td>
 
                     <td className="px-4 py-3">
-                      {employee?.name || "-"}
+                      {emp?.name || "-"}
                     </td>
 
                     <td className="px-4 py-3">
@@ -183,25 +194,27 @@ export default function PerformanceTable({ onEdit }) {
                       ${netProfit}
                     </td>
 
-                    <td className="px-4 py-3">
-                      <div className="flex justify-center gap-3">
+                    {isAdmin && (
+                      <td className="px-4 py-3">
+                        <div className="flex justify-center gap-3">
 
-                        <Pencil
-                          size={18}
-                          className="cursor-pointer text-green-600"
-                          onClick={() => onEdit(record)}
-                        />
+                          <Pencil
+                            size={18}
+                            className="cursor-pointer text-green-600"
+                            onClick={() => onEdit(record)}
+                          />
 
-                        <Trash2
-                          size={18}
-                          className="cursor-pointer text-red-600"
-                          onClick={() =>
-                            handleDelete(record.id)
-                          }
-                        />
+                          <Trash2
+                            size={18}
+                            className="cursor-pointer text-red-600"
+                            onClick={() =>
+                              handleDelete(record.id)
+                            }
+                          />
 
-                      </div>
-                    </td>
+                        </div>
+                      </td>
+                    )}
 
                   </tr>
                 );

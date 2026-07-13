@@ -4,6 +4,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 import { useApp } from "@/context/AppContext";
+import { useAuth } from "@/context/AuthContext";
 
 import PageHeader from "@/components/ui/PageHeader";
 import Modal from "@/components/ui/Modal";
@@ -16,6 +17,10 @@ export default function PerformancePage() {
     addPerformance,
     updatePerformance,
   } = useApp();
+
+  const { employee } = useAuth();
+
+  const isAdmin = employee?.role === "admin";
 
   const [open, setOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
@@ -35,18 +40,19 @@ export default function PerformancePage() {
     setSelectedRecord(null);
   };
 
-  const handleSave = (record) => {
+  const handleSave = async (record) => {
     if (record.id) {
-      updatePerformance(record);
+      const success = await updatePerformance(record);
 
-      toast.success("Performance record updated successfully");
+      if (success !== false) {
+        toast.success("Performance record updated successfully");
+      }
     } else {
-      addPerformance({
-        id: Date.now(),
-        ...record,
-      });
+      const success = await addPerformance(record);
 
-      toast.success("Performance record added successfully");
+      if (success !== false) {
+        toast.success("Performance record added successfully");
+      }
     }
 
     closeModal();
@@ -54,21 +60,26 @@ export default function PerformancePage() {
 
   return (
     <div className="space-y-6">
+
       <PageHeader
         title="Performance Records"
         description="Manage employee account earnings and connect costs."
       />
 
-      <div className="flex justify-end">
-        <button
-          onClick={openAddModal}
-          className="rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700"
-        >
-          + Add Performance
-        </button>
-      </div>
+      {isAdmin && (
+        <div className="flex justify-end">
+          <button
+            onClick={openAddModal}
+            className="rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700"
+          >
+            + Add Performance
+          </button>
+        </div>
+      )}
 
-      <PerformanceTable onEdit={openEditModal} />
+      <PerformanceTable
+        onEdit={openEditModal}
+      />
 
       <Modal
         open={open}
@@ -85,6 +96,7 @@ export default function PerformancePage() {
           onCancel={closeModal}
         />
       </Modal>
+
     </div>
   );
 }

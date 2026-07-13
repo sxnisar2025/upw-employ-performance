@@ -1,6 +1,7 @@
 "use client";
 
 import PageHeader from "@/components/ui/PageHeader";
+import RoleGuard from "@/components/RoleGuard";
 
 export default function SettingsPage() {
   return (
@@ -62,5 +63,12 @@ export default function SettingsPage() {
       </div>
 
     </div>
+  );
+   return (
+    <RoleGuard adminOnly>
+
+      {/* Existing Settings */}
+
+    </RoleGuard>
   );
 }

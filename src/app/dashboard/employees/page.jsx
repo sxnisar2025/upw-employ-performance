@@ -9,6 +9,7 @@ import Modal from "@/components/ui/Modal";
 import EmployeeTable from "@/components/employee/EmployeeTable";
 import EmployeeForm from "@/components/employee/EmployeeForm";
 import toast from "react-hot-toast";
+import RoleGuard from "@/components/RoleGuard";
 
 export default function EmployeesPage() {
   const { addEmployee, updateEmployee } = useApp();
@@ -84,5 +85,12 @@ export default function EmployeesPage() {
       </Modal>
 
     </div>
+  );
+   return (
+    <RoleGuard adminOnly>
+
+      {/* Existing Employees Page */}
+
+    </RoleGuard>
   );
 }

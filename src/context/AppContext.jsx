@@ -1,250 +1,261 @@
 "use client";
-import { supabase } from "@/lib/supabase";
+
 import { createContext, useContext, useEffect, useState } from "react";
-
-
-
-
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/context/AuthContext";
 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
+  const { employee } = useAuth();
+
   const [employees, setEmployees] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [performances, setPerformances] = useState([]);
 
+  /* ==========================
+      LOAD EMPLOYEES
+  ========================== */
+
+  const loadEmployees = async () => {
+    let query = supabase
+      .from("employees")
+      .select("*")
+      .order("id");
+
+    if (employee && employee.role !== "admin") {
+      query = query.eq("id", employee.id);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setEmployees(data || []);
+  };
+
+  /* ==========================
+      LOAD ACCOUNTS
+  ========================== */
+
   const loadAccounts = async () => {
-  const { data, error } = await supabase
-    .from("accounts")
-    .select("*")
-    .order("id", { ascending: true });
+    let query = supabase
+      .from("accounts")
+      .select("*")
+      .order("id");
 
-  if (error) {
-    console.error(error);
-    return;
-  }
+    if (employee && employee.role !== "admin") {
+      query = query.eq("employeeId", employee.id);
+    }
 
-  setAccounts(data || []);
-};
+    const { data, error } = await query;
 
-const loadPerformances = async () => {
-  const { data, error } = await supabase
-    .from("performances")
-    .select("*")
-    .order("id", { ascending: true });
+    if (error) {
+      console.error(error);
+      return;
+    }
 
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  setPerformances(data || []);
-};
-  /* -------------------------
-      Load Local Storage
-  ------------------------- */
-
-
-useEffect(() => {
-  loadEmployees();
-  loadAccounts();
-  loadPerformances();
-}, []);
-  /* -------------------------
-      Save Local Storage
-  ------------------------- */
-
-  /* ==========================
-        EMPLOYEE CRUD
-  ========================== */
-
-const addEmployee = async (employee) => {
-  // Never send id when creating a new employee
-  const employeeData = {
-    name: employee.name,
-    email: employee.email,
-    phone: employee.phone,
-    status: employee.status,
+    setAccounts(data || []);
   };
 
-  const { data, error } = await supabase
-    .from("employees")
-    .insert([employeeData])
-    .select();
-
-  if (error) {
-    console.error(error);
-    alert(error.message);
-    return false;
-  }
-
-  loadEmployees();
-  return true;
-};
-
-const updateEmployee = async (employee) => {
-  const { id, ...values } = employee;
-
-  const { error } = await supabase
-    .from("employees")
-    .update(values)
-    .eq("id", id);
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  loadEmployees();
-};
-
-const deleteEmployee = async (id) => {
-  const { error } = await supabase
-    .from("employees")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  loadEmployees();
-};
-
   /* ==========================
-        ACCOUNT CRUD
+      LOAD PERFORMANCES
   ========================== */
 
-const addAccount = async (account) => {
-  const accountData = {
-    employeeId: account.employeeId,
-    name: account.name,
-    category: account.category,
-    status: account.status,
+  const loadPerformances = async () => {
+    let query = supabase
+      .from("performances")
+      .select("*")
+      .order("id");
+
+    if (employee && employee.role !== "admin") {
+      const { data: myAccounts } = await supabase
+        .from("accounts")
+        .select("id")
+        .eq("employeeId", employee.id);
+
+      const ids = (myAccounts || []).map((a) => a.id);
+
+      if (ids.length === 0) {
+        setPerformances([]);
+        return;
+      }
+
+      query = query.in("accountId", ids);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setPerformances(data || []);
   };
 
-  const { error } = await supabase
-    .from("accounts")
-    .insert([accountData]);
+  /* ==========================
+      LOAD ALL DATA
+  ========================== */
 
-  if (error) {
-    alert(error.message);
-    return false;
-  }
+  useEffect(() => {
+    loadEmployees();
+    loadAccounts();
+    loadPerformances();
+  }, [employee]);
 
-  await loadAccounts();
-  return true;
-};
+  /* ==========================
+      EMPLOYEE CRUD
+  ========================== */
 
-const updateAccount = async (account) => {
-  const { id, ...values } = account;
+  const addEmployee = async (employeeData) => {
+    const { error } = await supabase
+      .from("employees")
+      .insert([employeeData]);
 
-  const { error } = await supabase
-    .from("accounts")
-    .update(values)
-    .eq("id", id);
+    if (error) {
+      alert(error.message);
+      return false;
+    }
 
-  if (error) {
-    alert(error.message);
-    return false;
-  }
+    loadEmployees();
+    return true;
+  };
 
-  await loadAccounts();
-  return true;
-};
+  const updateEmployee = async (employeeData) => {
+    const { id, ...values } = employeeData;
 
- const deleteAccount = async (id) => {
-  const { error } = await supabase
-    .from("accounts")
-    .delete()
-    .eq("id", id);
+    const { error } = await supabase
+      .from("employees")
+      .update(values)
+      .eq("id", id);
 
-  if (error) {
-    alert(error.message);
-    return false;
-  }
+    if (error) {
+      alert(error.message);
+      return false;
+    }
 
-  await loadAccounts();
-  return true;
-};
+    loadEmployees();
+    return true;
+  };
+
+  const deleteEmployee = async (id) => {
+    const { error } = await supabase
+      .from("employees")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      alert(error.message);
+      return false;
+    }
+
+    loadEmployees();
+    return true;
+  };
+
+  /* ==========================
+      ACCOUNT CRUD
+  ========================== */
+
+  const addAccount = async (accountData) => {
+    const { error } = await supabase
+      .from("accounts")
+      .insert([accountData]);
+
+    if (error) {
+      alert(error.message);
+      return false;
+    }
+
+    loadAccounts();
+    return true;
+  };
+
+  const updateAccount = async (accountData) => {
+    const { id, ...values } = accountData;
+
+    const { error } = await supabase
+      .from("accounts")
+      .update(values)
+      .eq("id", id);
+
+    if (error) {
+      alert(error.message);
+      return false;
+    }
+
+    loadAccounts();
+    return true;
+  };
+
+  const deleteAccount = async (id) => {
+    const { error } = await supabase
+      .from("accounts")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      alert(error.message);
+      return false;
+    }
+
+    loadAccounts();
+    return true;
+  };
 
   /* ==========================
       PERFORMANCE CRUD
   ========================== */
 
-const addPerformance = async (performance) => {
-  const performanceData = {
-    accountId: performance.accountId,
-    month: performance.month,
-    buy: performance.buy,
-    earn: performance.earn,
-    received: performance.received,
-    pending: performance.pending,
+  const addPerformance = async (performanceData) => {
+    const { error } = await supabase
+      .from("performances")
+      .insert([performanceData]);
+
+    if (error) {
+      alert(error.message);
+      return false;
+    }
+
+    loadPerformances();
+    return true;
   };
 
-  const { data, error } = await supabase
-    .from("performances")
-    .insert([performanceData])
-    .select();
+  const updatePerformance = async (performanceData) => {
+    const { id, ...values } = performanceData;
 
-  console.log("Inserted:", data);
-  console.log("Error:", error);
+    const { error } = await supabase
+      .from("performances")
+      .update(values)
+      .eq("id", id);
 
-  if (error) {
-    console.error(error);
-    alert(error.message);
-    return false;
-  }
+    if (error) {
+      alert(error.message);
+      return false;
+    }
 
-  await loadPerformances();
-  return true;
-};
+    loadPerformances();
+    return true;
+  };
 
-const updatePerformance = async (performance) => {
-  const { id, ...values } = performance;
+  const deletePerformance = async (id) => {
+    const { error } = await supabase
+      .from("performances")
+      .delete()
+      .eq("id", id);
 
-  const { error } = await supabase
-    .from("performances")
-    .update(values)
-    .eq("id", id);
+    if (error) {
+      alert(error.message);
+      return false;
+    }
 
-  if (error) {
-    alert(error.message);
-    return false;
-  }
-
-  await loadPerformances();
-  return true;
-};
-
-const deletePerformance = async (id) => {
-  const { error } = await supabase
-    .from("performances")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    alert(error.message);
-    return false;
-  }
-
-  await loadPerformances();
-  return true;
-};
-const loadEmployees = async () => {
-  const { data, error } = await supabase
-    .from("employees")
-    .select("*")
-    .order("id", { ascending: true });
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  setEmployees(data || []);
-};
+    loadPerformances();
+    return true;
+  };
 
   return (
     <AppContext.Provider
@@ -252,6 +263,10 @@ const loadEmployees = async () => {
         employees,
         accounts,
         performances,
+
+        loadEmployees,
+        loadAccounts,
+        loadPerformances,
 
         addEmployee,
         updateEmployee,
