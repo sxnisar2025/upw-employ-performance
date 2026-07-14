@@ -1,74 +1,85 @@
 "use client";
 
-import PageHeader from "@/components/ui/PageHeader";
-import RoleGuard from "@/components/RoleGuard";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SettingsPage() {
+  const { user } = useAuth();
+
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+
+    if (!user) {
+      toast.error("User not found.");
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+
+    setLoading(true);
+
+    const res = await fetch("/api/admin/reset-password", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: user.id,
+        password,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      toast.success("Password updated successfully.");
+      setPassword("");
+    } else {
+      toast.error(data.error || "Something went wrong.");
+    }
+
+    setLoading(false);
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="max-w-xl">
+      <h1 className="mb-6 text-3xl font-bold">
+        Settings
+      </h1>
 
-      <PageHeader
-        title="Settings"
-        description="Application Settings"
-      />
-
-      <div className="rounded-xl border bg-white p-6 shadow-sm">
-
-        <h2 className="mb-5 text-xl font-semibold">
-          General Settings
+      <div className="rounded-xl border bg-white p-6 shadow">
+        <h2 className="mb-4 text-xl font-semibold">
+          Change Admin Password
         </h2>
 
-        <div className="grid gap-5 md:grid-cols-2">
+        <form
+          onSubmit={handleChangePassword}
+          className="space-y-4"
+        >
+          <input
+            type="password"
+            placeholder="New Password"
+            className="w-full rounded-lg border p-3"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-          <div>
-            <label className="mb-2 block">
-              Company Name
-            </label>
-
-            <input
-              className="w-full rounded-lg border p-3"
-              defaultValue="Upwork Employee Record"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block">
-              Currency
-            </label>
-
-            <select className="w-full rounded-lg border p-3">
-              <option>USD ($)</option>
-              <option>PKR (Rs)</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="mb-2 block">
-              Connect Price
-            </label>
-
-            <input
-              type="number"
-              className="w-full rounded-lg border p-3"
-              defaultValue="0.15"
-            />
-          </div>
-
-        </div>
-
-        <button className="mt-6 rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700">
-          Save Settings
-        </button>
-
+          <button
+            type="submit"
+            disabled={loading}
+            className="rounded-lg bg-blue-600 px-5 py-3 text-white"
+          >
+            {loading ? "Updating..." : "Update Password"}
+          </button>
+        </form>
       </div>
-
     </div>
-  );
-   return (
-    <RoleGuard adminOnly>
-
-      {/* Existing Settings */}
-
-    </RoleGuard>
   );
 }
