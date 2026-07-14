@@ -40,6 +40,9 @@ export default function AccountCard({ account, employeeId }) {
           <p className="font-semibold">${account.received}</p>
         </div>
 
+
+        
+
         <div>
           <p className="text-sm text-gray-500">Pending</p>
           <p className="font-semibold">${account.pending}</p>
