@@ -3,7 +3,11 @@ export function getDashboardStats(
   accounts,
   performances
 ) {
-  const totalEmployees = employees.length;
+  // Exclude Admin from employee count
+  const totalEmployees = employees.filter(
+    (employee) => employee.role !== "admin"
+  ).length;
+
   const totalAccounts = accounts.length;
 
   const totalConnectCost = performances.reduce(

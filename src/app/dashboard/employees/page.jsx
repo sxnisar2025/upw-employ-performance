@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 import { useApp } from "@/context/AppContext";
 
+import RoleGuard from "@/components/RoleGuard";
 import PageHeader from "@/components/ui/PageHeader";
 import Modal from "@/components/ui/Modal";
 import EmployeeTable from "@/components/employee/EmployeeTable";
 import EmployeeForm from "@/components/employee/EmployeeForm";
-import toast from "react-hot-toast";
-import RoleGuard from "@/components/RoleGuard";
 
 export default function EmployeesPage() {
   const { addEmployee, updateEmployee } = useApp();
@@ -32,65 +32,55 @@ export default function EmployeesPage() {
     setSelectedEmployee(null);
   };
 
-  const handleSave = (employee) => {
-  if (employee.id) {
-    updateEmployee(employee);
+  const handleSave = async (employee) => {
+    if (employee.id) {
+      await updateEmployee(employee);
+      toast.success("Employee updated successfully");
+    } else {
+      await addEmployee(employee);
+      toast.success("Employee added successfully");
+    }
 
-    toast.success("Employee updated successfully");
-  } else {
-    addEmployee({
-      id: Date.now(),
-      ...employee,
-    });
-
-    toast.success("Employee added successfully");
-  }
-
-  closeModal();
-};
+    closeModal();
+  };
 
   return (
-    <div className="space-y-6">
-
-      <PageHeader
-        title="Employees"
-        description="Manage all employees."
-      />
-
-      <div className="flex justify-end">
-        <button
-          onClick={openAddModal}
-          className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white hover:bg-blue-700"
-        >
-          + Add Employee
-        </button>
-      </div>
-
-      <EmployeeTable onEdit={openEditModal} />
-
-      <Modal
-        open={open}
-        onClose={closeModal}
-        title={
-          selectedEmployee
-            ? "Edit Employee"
-            : "Add Employee"
-        }
-      >
-        <EmployeeForm
-          employee={selectedEmployee}
-          onSave={handleSave}
-          onCancel={closeModal}
-        />
-      </Modal>
-
-    </div>
-  );
-   return (
     <RoleGuard adminOnly>
+      <div className="space-y-6">
 
-      {/* Existing Employees Page */}
+        <PageHeader
+          title="Employees"
+          description="Manage all employees."
+        />
 
+        <div className="flex justify-end">
+          <button
+            onClick={openAddModal}
+            className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white hover:bg-blue-700"
+          >
+            + Add Employee
+          </button>
+        </div>
+
+        <EmployeeTable onEdit={openEditModal} />
+
+        <Modal
+          open={open}
+          onClose={closeModal}
+          title={
+            selectedEmployee
+              ? "Edit Employee"
+              : "Add Employee"
+          }
+        >
+          <EmployeeForm
+            employee={selectedEmployee}
+            onSave={handleSave}
+            onCancel={closeModal}
+          />
+        </Modal>
+
+      </div>
     </RoleGuard>
   );
 }
