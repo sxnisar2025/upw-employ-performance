@@ -25,6 +25,11 @@ export default function DashboardFilters({
     "December",
   ];
 
+  // Hide Admin from employee dropdown
+  const employeeList = employees.filter(
+    (employee) => employee.role !== "admin"
+  );
+
   // Show only accounts of selected employee
   const filteredAccounts = employeeFilter
     ? accounts.filter(
@@ -36,6 +41,7 @@ export default function DashboardFilters({
   return (
     <div className="rounded-xl bg-white border shadow-sm p-5 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
         {/* Employee */}
         <div>
           <label className="block mb-2 text-sm font-medium">
@@ -52,7 +58,7 @@ export default function DashboardFilters({
           >
             <option value="">All Employees</option>
 
-            {employees.map((employee) => (
+            {employeeList.map((employee) => (
               <option
                 key={employee.id}
                 value={employee.id}
@@ -114,6 +120,7 @@ export default function DashboardFilters({
             ))}
           </select>
         </div>
+
       </div>
     </div>
   );
