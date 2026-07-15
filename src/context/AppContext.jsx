@@ -112,18 +112,31 @@ export function AppProvider({ children }) {
   ========================== */
 
   const addEmployee = async (employeeData) => {
-    const { error } = await supabase
-      .from("employees")
-      .insert([employeeData]);
+  try {
+    const res = await fetch("/api/admin/create-employee", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(employeeData),
+    });
 
-    if (error) {
-      alert(error.message);
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "Failed to create employee.");
       return false;
     }
 
-    loadEmployees();
+    await loadEmployees();
+
     return true;
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong.");
+    return false;
+  }
+};
 
   const updateEmployee = async (employeeData) => {
     const { id, ...values } = employeeData;

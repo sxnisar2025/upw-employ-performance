@@ -33,16 +33,26 @@ export default function EmployeesPage() {
   };
 
   const handleSave = async (employee) => {
-    if (employee.id) {
-      await updateEmployee(employee);
-      toast.success("Employee updated successfully");
-    } else {
-      await addEmployee(employee);
-      toast.success("Employee added successfully");
-    }
+  let success = false;
 
+  if (employee.id) {
+    success = await updateEmployee(employee);
+
+    if (success) {
+      toast.success("Employee updated successfully");
+    }
+  } else {
+    success = await addEmployee(employee);
+
+    if (success) {
+      toast.success("Employee created successfully");
+    }
+  }
+
+  if (success) {
     closeModal();
-  };
+  }
+};
 
   return (
     <RoleGuard adminOnly>
