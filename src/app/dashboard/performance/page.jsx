@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
 import { useApp } from "@/context/AppContext";
@@ -11,11 +11,14 @@ import Modal from "@/components/ui/Modal";
 
 import PerformanceTable from "@/components/performance/PerformanceTable";
 import PerformanceForm from "@/components/performance/PerformanceForm";
+import ReportFilters from "@/components/reports/ReportFilters";
 
 export default function PerformancePage() {
   const {
     addPerformance,
     updatePerformance,
+    performances,
+    accounts,
   } = useApp();
 
   const { employee } = useAuth();
@@ -24,6 +27,12 @@ export default function PerformancePage() {
 
   const [open, setOpen] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
+
+  const [filters, setFilters] = useState({
+    employeeId: "",
+    accountId: "",
+    month: "",
+  });
 
   const openAddModal = () => {
     setSelectedRecord(null);
@@ -40,27 +49,66 @@ export default function PerformancePage() {
     setSelectedRecord(null);
   };
 
+  const filteredPerformances = useMemo(() => {
+    return performances.filter((record) => {
+      const account = accounts.find(
+        (a) => a.id === record.accountId
+      );
+
+      if (!account) return false;
+
+      // Employee Filter
+      if (
+        filters.employeeId &&
+        account.employeeId !== Number(filters.employeeId)
+      ) {
+        return false;
+      }
+
+      // Account Filter
+      if (
+        filters.accountId &&
+        record.accountId !== Number(filters.accountId)
+      ) {
+        return false;
+      }
+
+      // Month Filter
+      if (
+        filters.month &&
+        record.month !== filters.month
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [performances, accounts, filters]);
+
   const handleSave = async (record) => {
+    let success;
+
     if (record.id) {
-      const success = await updatePerformance(record);
+      success = await updatePerformance(record);
 
       if (success !== false) {
         toast.success("Performance record updated successfully");
       }
     } else {
-      const success = await addPerformance(record);
+      success = await addPerformance(record);
 
       if (success !== false) {
         toast.success("Performance record added successfully");
       }
     }
 
-    closeModal();
+    if (success !== false) {
+      closeModal();
+    }
   };
 
   return (
     <div className="space-y-6">
-
       <PageHeader
         title="Performance Records"
         description="Manage employee account earnings and connect costs."
@@ -77,7 +125,13 @@ export default function PerformancePage() {
         </div>
       )}
 
+      <ReportFilters
+        filters={filters}
+        setFilters={setFilters}
+      />
+
       <PerformanceTable
+        data={filteredPerformances}
         onEdit={openEditModal}
       />
 
@@ -96,7 +150,6 @@ export default function PerformancePage() {
           onCancel={closeModal}
         />
       </Modal>
-
     </div>
   );
 }

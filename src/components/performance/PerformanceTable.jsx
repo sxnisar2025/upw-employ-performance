@@ -8,7 +8,10 @@ import { useAuth } from "@/context/AuthContext";
 
 import SearchInput from "@/components/ui/SearchInput";
 
-export default function PerformanceTable({ onEdit }) {
+export default function PerformanceTable({
+  data,
+  onEdit,
+}) {
   const {
     performances,
     accounts,
@@ -22,27 +25,27 @@ export default function PerformanceTable({ onEdit }) {
 
   const [search, setSearch] = useState("");
 
-  const filteredData = performances.filter((record) => {
-    const account = accounts.find(
-      (a) => a.id === record.accountId
-    );
+ const filteredData = (data || performances).filter((record) => {
+  const account = accounts.find(
+    (a) => a.id === record.accountId
+  );
 
-    const emp = employees.find(
-      (e) => e.id === account?.employeeId
-    );
+  const emp = employees.find(
+    (e) => e.id === account?.employeeId
+  );
 
-    const employeeName = emp?.name || "";
-    const accountName = account?.name || "";
+  const employeeName = emp?.name || "";
+  const accountName = account?.name || "";
 
-    return (
-      employeeName
-        .toLowerCase()
-        .includes(search.toLowerCase()) ||
-      accountName
-        .toLowerCase()
-        .includes(search.toLowerCase())
-    );
-  });
+  return (
+    employeeName
+      .toLowerCase()
+      .includes(search.toLowerCase()) ||
+    accountName
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
+});
 
   const handleDelete = (id) => {
     if (window.confirm("Delete this record?")) {
